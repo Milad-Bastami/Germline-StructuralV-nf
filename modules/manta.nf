@@ -31,10 +31,10 @@ process manta {
 	# run SV detection 
 	manta/runWorkflow.py -m local -j ${task.cpus}
 
-	# clean up outputs
-	mv manta/results/variants/diploidSV.vcf.gz \
+	# clean up outputs (didn't changed the output name to tumorSV)
+	mv manta/results/variants/tumorSV.vcf.gz \
 		manta/Manta_${sampleID}.diploidSV.vcf.gz
-	mv manta/results/variants/diploidSV.vcf.gz.tbi \
+	mv manta/results/variants/tumorSV.vcf.gz.tbi \
 		manta/Manta_${sampleID}.diploidSV.vcf.gz.tbi
 	
 	# convert multiline inversion BNDs from manta vcf to single line
