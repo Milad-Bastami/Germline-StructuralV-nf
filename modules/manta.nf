@@ -1,5 +1,7 @@
 // run manta structural variant detection and convert inversions
 // change the workflow from germline to tumor_only mode
+// tumor-only mode outputs a single vcf file tumorSV.vcf.gz
+// Here, I did not change  original variable name (diploidSV), bear in mind that this is actually tumorSV now.
 process manta {
 	debug false
 	publishDir "${params.outDir}/${sampleID}", mode: 'copy'
@@ -10,10 +12,6 @@ process manta {
 	path(ref_fai)
 
 	output:
-	tuple val(sampleID), path("manta/Manta_${sampleID}.candidateSmallIndels.vcf.gz")		, emit: manta_small_indels
-	tuple val(sampleID), path("manta/Manta_${sampleID}.candidateSmallIndels.vcf.gz.tbi")	, emit: manta_small_indels_tbi
-	tuple val(sampleID), path("manta/Manta_${sampleID}.candidateSV.vcf.gz")					, emit: manta_candidate
-	tuple val(sampleID), path("manta/Manta_${sampleID}.candidateSV.vcf.gz.tbi")				, emit: manta_candidate_tbi
 	tuple val(sampleID), path("manta/Manta_${sampleID}.diploidSV.vcf.gz")					, emit: manta_diploid
 	tuple val(sampleID), path("manta/Manta_${sampleID}.diploidSV.vcf.gz.tbi")				, emit: manta_diploid_tbi
 	tuple val(sampleID), path("manta/Manta_${sampleID}.diploidSV_converted.vcf.gz")			, emit: manta_diploid_convert
@@ -25,7 +23,7 @@ process manta {
 	"""
 	# configure manta SV analysis workflow
 	configManta.py \
-		--normalBam ${bam} \
+		--tumorBam ${bam} \
 		--referenceFasta ${params.ref} \
 		--runDir manta \
 		${intervals} ${extraArgs}
@@ -34,14 +32,6 @@ process manta {
 	manta/runWorkflow.py -m local -j ${task.cpus}
 
 	# clean up outputs
-	mv manta/results/variants/candidateSmallIndels.vcf.gz \
-		manta/Manta_${sampleID}.candidateSmallIndels.vcf.gz
-	mv manta/results/variants/candidateSmallIndels.vcf.gz.tbi \
-		manta/Manta_${sampleID}.candidateSmallIndels.vcf.gz.tbi
-	mv manta/results/variants/candidateSV.vcf.gz \
-		manta/Manta_${sampleID}.candidateSV.vcf.gz
-	mv manta/results/variants/candidateSV.vcf.gz.tbi \
-		manta/Manta_${sampleID}.candidateSV.vcf.gz.tbi
 	mv manta/results/variants/diploidSV.vcf.gz \
 		manta/Manta_${sampleID}.diploidSV.vcf.gz
 	mv manta/results/variants/diploidSV.vcf.gz.tbi \
