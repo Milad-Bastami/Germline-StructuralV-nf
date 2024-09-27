@@ -1,4 +1,5 @@
 // run manta structural variant detection and convert inversions
+// change the workflow from germline to tumor_only mode
 process manta {
 	debug false
 	publishDir "${params.outDir}/${sampleID}", mode: 'copy'
